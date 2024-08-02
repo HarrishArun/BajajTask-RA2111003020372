@@ -76,7 +76,7 @@ function App() {
       <br />
       <button onClick={handleSubmit}>Submit</button>
       {response && (
-        <select multiple onChange={handleDropdownChange}>
+        <select multiple={true} onChange={handleDropdownChange}>
           <option value="Numbers">Numbers</option>
           <option value="Alphabets">Alphabets</option>
           <option value="Highest Alphabet">Highest Alphabet</option>
