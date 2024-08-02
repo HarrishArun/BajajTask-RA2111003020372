@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Select from "react-select";
 import "./App.css";
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
       console.log("Parsed JSON:", parsedJson); // Debugging statement
 
       // Send POST request to the backend
-      const res = await fetch("http://localhost:3001/bfhl", {
+      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/bfhl`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,20 +29,16 @@ function App() {
 
       // Parse and set the response data
       const data = await res.json();
-      console.log("Response data:", data); // Debugging statement
+      console.log("Response data:", data);
       setResponse(data);
     } catch (error) {
-      console.error("Error:", error); // Debugging statement
+      console.error("Error:", error);
       alert("Invalid JSON input or network error");
     }
   };
 
-  const handleDropdownChange = (e) => {
-    const { options } = e.target;
-    const selected = Array.from(options)
-      .filter((option) => option.selected)
-      .map((option) => option.value);
-    setSelectedOptions(selected);
+  const handleDropdownChange = (selected) => {
+    setSelectedOptions(selected.map((option) => option.value));
   };
 
   const renderResponse = () => {
@@ -53,15 +50,21 @@ function App() {
     const showHighestAlphabet = selectedOptions.includes("Highest Alphabet");
 
     return (
-      <div>
-        {showNumbers && <div>Numbers: {JSON.stringify(numbers)}</div>}
-        {showAlphabets && <div>Alphabets: {JSON.stringify(alphabets)}</div>}
+      <div className="response-container">
+        {showNumbers && <div>Numbers: {numbers.join(",")}</div>}
+        {showAlphabets && <div>Alphabets: {alphabets.join(",")}</div>}
         {showHighestAlphabet && (
-          <div>Highest Alphabet: {JSON.stringify(highest_alphabet)}</div>
+          <div>Highest Alphabet: {highest_alphabet}</div>
         )}
       </div>
     );
   };
+
+  const options = [
+    { value: "Numbers", label: "Numbers" },
+    { value: "Alphabets", label: "Alphabets" },
+    { value: "Highest Alphabet", label: "Highest Alphabet" },
+  ];
 
   return (
     <div className="App">
@@ -76,11 +79,16 @@ function App() {
       <br />
       <button onClick={handleSubmit}>Submit</button>
       {response && (
-        <select multiple={true} onChange={handleDropdownChange}>
-          <option value="Numbers">Numbers</option>
-          <option value="Alphabets">Alphabets</option>
-          <option value="Highest Alphabet">Highest Alphabet</option>
-        </select>
+        <div className="multi-select-container">
+          <Select
+            isMulti
+            name="filters"
+            options={options}
+            className="multi-select"
+            classNamePrefix="select"
+            onChange={handleDropdownChange}
+          />
+        </div>
       )}
       {renderResponse()}
     </div>
